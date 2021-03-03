@@ -9,6 +9,7 @@ services:
        - PGDATA=/var/lib/postgresql/data/pgdata
        - POSTGRES_DB=postgres
     volumes:
-       - ./postgres_data:/var/lib/postgresql
+       - ./Data:/var/lib/postgresql
+       - ./Phase1/Dataset/:/srv/soen363/phase1/
     ports:
        - 5432:5432
