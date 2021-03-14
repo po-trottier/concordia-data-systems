@@ -1,0 +1,143 @@
+CREATE MATERIALIZED VIEW common_tags AS
+    WITH tags_count AS (
+        SELECT COUNT(tid) 
+        FROM tags
+    )
+    SELECT M2.mid, T2.title, T2.count::REAL / C.count::REAL AS tags_similarity
+    FROM tags_count C, movies M2 RIGHT JOIN (
+        SELECT M1.mid, M1.title, COUNT(T1.tid)
+        FROM tags T1, movies M1
+        WHERE 
+            T1.tid IN (
+                SELECT T.tid
+                FROM tags T, movies M
+                WHERE 
+                    M.title = 'Mr. & Mrs. Smith' AND
+                    T.mid = M.mid
+            ) AND 
+            M1.title != 'Mr. & Mrs. Smith' AND
+            T1.mid = M1.mid
+        GROUP BY M1.mid, M1.title
+        ORDER BY COUNT(T1.tid) DESC
+    ) T2
+    ON T2.mid = M2.mid
+    ORDER BY tags_similarity DESC;
+
+SELECT * FROM common_tags;
+
+-- 
+
+CREATE MATERIALIZED VIEW common_actors AS
+    WITH actors_count AS (
+        SELECT COUNT(distinct name) 
+        FROM actors
+    )
+    SELECT M2.mid, A2.title, A2.count::REAL / C.count::REAL AS actors_similarity
+    FROM actors_count C, movies M2 RIGHT JOIN (
+        SELECT M1.mid, M1.title, COUNT(A1.name)
+        FROM actors A1, movies M1
+        WHERE 
+            A1.name IN (
+                SELECT A.name
+                FROM actors A, movies M
+                WHERE 
+                    M.title = 'Mr. & Mrs. Smith' AND
+                    A.mid = M.mid
+            ) AND 
+            M1.title != 'Mr. & Mrs. Smith' AND
+            A1.mid = M1.mid
+        GROUP BY M1.mid, M1.title
+        ORDER BY COUNT(A1.name) DESC
+    ) A2
+    ON A2.mid = M2.mid
+    ORDER BY actors_similarity DESC;
+
+SELECT * FROM common_actors;
+
+--
+
+CREATE MATERIALIZED VIEW common_genres AS
+    WITH genres_count AS (
+        SELECT COUNT(distinct genre) 
+        FROM genres
+    )
+    SELECT M2.mid, G2.title, G2.count::REAL / C.count::REAL AS genres_similarity
+    FROM genres_count C, movies M2 RIGHT JOIN(
+        SELECT M1.mid, M1.title, COUNT(G1.genre)
+        FROM genres G1, movies M1
+        WHERE 
+            G1.genre IN (
+                SELECT G.genre
+                FROM genres G, movies M
+                WHERE 
+                    M.title = 'Mr. & Mrs. Smith' AND
+                    G.mid = M.mid
+            ) AND 
+            M1.title != 'Mr. & Mrs. Smith' AND
+            G1.mid = M1.mid
+        GROUP BY M1.mid, M1.title
+        ORDER BY COUNT(G1.genre) DESC
+    ) G2
+    ON G2.mid = M2.mid
+    ORDER BY genres_similarity DESC;
+
+SELECT * FROM common_genres;
+
+--
+
+CREATE OR REPLACE FUNCTION norm1(REAL) RETURNS REAL
+    AS 
+        $$
+        DECLARE normal1 REAL;
+        BEGIN
+            SELECT (($1 - 2005) / (MAX(M.year) - MIN(M.year))) INTO normal1
+            FROM movies M;
+
+            RETURN normal1;
+        END;
+        $$
+    LANGUAGE plpgsql;
+
+CREATE MATERIALIZED VIEW age_diff AS
+    SELECT M1.mid, M1.title, norm1(M1.year::REAL) as ageGap
+    FROM movies M1
+    GROUP BY M1.mid, M1.title, M1.year
+    ORDER BY ageGap ASC;
+
+SELECT * FROM age_diff;
+
+--
+
+CREATE OR REPLACE FUNCTION norm2(REAL) RETURNS REAL
+    AS 
+        $$
+        DECLARE normal2 REAL;
+        BEGIN
+            SELECT (($1 - 3.4) / (MAX(M.rating) - MIN(M.rating))) INTO normal2
+            FROM movies M;
+
+            RETURN normal2;
+        END;
+        $$
+    LANGUAGE plpgsql;
+
+CREATE MATERIALIZED VIEW rating_diff AS
+    SELECT M1.mid, M1.title, norm2(M1.rating::REAL) as ratingGap
+    FROM movies M1
+    GROUP BY M1.mid, M1.title, M1.rating
+    ORDER BY ratingGap ASC;
+
+SELECT * FROM rating_diff;
+
+--
+
+SELECT M.title, ((tags_similarity + actors_similarity + genres_similarity + ageGap + ratingGap)/5)*100 AS movie_similarity
+FROM common_tags, common_actors, common_genres, age_diff, rating_diff, movies M
+WHERE 
+    common_tags.mid = common_actors.mid AND
+    common_actors.mid = common_genres.mid AND
+    common_genres.mid = age_diff.mid AND
+    age_diff.mid = rating_diff.mid AND
+    rating_diff.mid = M.mid
+ORDER BY movie_similarity DESC
+LIMIT 10;
