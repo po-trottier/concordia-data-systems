@@ -108,3 +108,16 @@ CREATE OR REPLACE VIEW age_gap AS
     ORDER BY gap ASC;
 
 SELECT * FROM age_gap;
+
+--
+
+SELECT M.title, ((tags_similarity + actors_similarity + genres_similarity + ageGap + ratingGap)/5)*100 AS movie_similarity
+FROM tags_in_common, actors_in_common, genres_in_common, age_gap, rating_gap, movies M
+WHERE 
+    tags_in_common.mid = actors_in_common.mid AND
+    actors_in_common.mid = genres_in_common.mid AND
+    genres_in_common.mid = age_gap.mid AND
+    age_gap.mid = rating_gap.mid AND
+    rating_gap.mid = M.mid
+ORDER BY movie_similarity DESC
+LIMIT 10;
