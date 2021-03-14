@@ -1,0 +1,7 @@
+-- Get the cast of the movie titled "The Dark Knight", sorted in ascending alphabetical order
+SELECT DISTINCT A.name AS "Cast"
+FROM actors A, movies M
+WHERE
+    M.mid = A.mid AND
+    M.title = 'The Dark Knight'
+ORDER BY A.name ASC;

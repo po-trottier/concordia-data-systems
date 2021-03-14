@@ -1,0 +1,14 @@
+-- Get the titles of movies whose tags include at least one occurrence of the word "bad" and another of "good"
+SELECT M.title
+FROM movies M, tags T, tag_names TN
+WHERE 
+    M.mid = T.mid AND T.tid = TN.tid AND
+    TN.tag IN (
+        SELECT TN.tag 
+        FROM tag_names TN
+        WHERE TN.tag LIKE 'good%'
+        UNION
+        SELECT TN.tag 
+        FROM tag_names TN
+        WHERE TN.tag LIKE 'bad%'
+    );

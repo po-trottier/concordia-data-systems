@@ -1,0 +1,9 @@
+CREATE INDEX actors_index ON actors(name);
+CREATE INDEX actors_id_index ON actors(mid);
+CREATE INDEX movies_index ON movies(title);
+CREATE INDEX movies_count_index ON movies(num_ratings);
+CREATE INDEX movies_rating_index ON movies(rating);
+CREATE INDEX genres_index ON genres(genre);
+CREATE INDEX tag_names_index ON tag_names(tag);
+CREATE INDEX co_actors_index ON actors(mid);
+CREATE INDEX maxim_co_actors ON movies(mid); 

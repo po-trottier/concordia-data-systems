@@ -1,0 +1,11 @@
+-- Find the actor with the longest longevity
+SELECT 
+    A.name, 
+    MIN(M.year) as start, 
+    MAX(M.year) as end, 
+    MAX(M.year) - MIN(M.year) as longevity
+FROM actors A, movies M
+WHERE A.mid = M.mid
+GROUP BY A.name 
+ORDER BY MAX(M.year) - MIN(M.year) DESC
+LIMIT 1;

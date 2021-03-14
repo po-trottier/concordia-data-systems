@@ -1,0 +1,7 @@
+-- Get the distinct genres in the database, alongside their number of occurrences (only for 1000+ occurrences), sorted ascending numerically in occurrences
+SELECT DISTINCT G.genre, COUNT(M.*) AS number_of_movies_in_genre
+FROM genres G, movies M
+WHERE G.mid = M.mid
+GROUP BY G.genre
+HAVING COUNT(M.*) > 1000
+ORDER BY COUNT(M.*) ASC;

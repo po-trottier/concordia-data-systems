@@ -1,0 +1,11 @@
+-- Detecting duplicates
+SELECT title, year, rating, num_ratings, COUNT(*) occurrences
+FROM movies
+GROUP BY title, year, rating, num_ratings
+HAVING COUNT(*) > 1;
+
+-- Creating a view that contains no duplicates
+CREATE OR REPLACE VIEW no_duplicates AS 
+SELECT DISTINCT title, year, rating, num_ratings
+FROM movies
+GROUP BY title, year, rating, num_ratings;

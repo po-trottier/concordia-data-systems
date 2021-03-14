@@ -1,0 +1,7 @@
+-- Get the movie titles starring "Daniel Craig", sorted in an ascending alphabetical order
+SELECT DISTINCT M.title AS "Movie Titles"
+FROM actors A, movies M
+WHERE
+    M.mid = A.mid AND
+    A.name = 'Daniel Craig'
+ORDER BY M.title ASC;
