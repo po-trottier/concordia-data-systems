@@ -1,0 +1,40 @@
+-- High Ratings view to get actors that have participated in a movie with a rating >= 4
+CREATE OR REPLACE VIEW high_ratings AS
+    SELECT DISTINCT A.name 
+    FROM actors A, movies M
+    WHERE A.mid = m.mid AND m.rating >= 4; 
+
+-- Low Ratings view to get actors that have participated in a movie with a rating < 4
+CREATE OR REPLACE VIEW low_ratings AS
+    SELECT DISTINCT A.name 
+    FROM actors A, movies M
+    WHERE A.mid = m.mid AND m.rating < 4;
+
+-- Get the actors count coming from High Ratings 
+SELECT COUNT(*) as result_count_high
+FROM high_ratings;
+
+-- Get the actors count coming from Low Ratings
+SELECT COUNT(*) as result_count_low
+FROM low_ratings;
+
+-- Get the number of No Flop actors in the database
+SELECT COUNT(*)
+FROM high_ratings
+WHERE name NOT IN (
+    SELECT name
+    FROM low_ratings
+);
+
+-- Get the name and movie count of the Top 10 No Flop actors
+SELECT R.name, COUNT(A.*) as movie_count
+FROM high_ratings R, actors A
+WHERE 
+    R.name NOT IN (
+        SELECT name
+        FROM low_ratings
+    ) AND 
+    A.name = R.NAME
+GROUP BY R.name
+ORDER BY COUNT(A.*) DESC
+LIMIT 10;

@@ -1,0 +1,5 @@
+-- For each year, print the movie title, year, and rating, sorted in the ascending order of year and the descending order of movie rating
+SELECT M.title, M.year, M.rating
+FROM movies M
+WHERE M.num_ratings > 0
+ORDER BY M.year ASC, M.rating DESC;

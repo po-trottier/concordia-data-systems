@@ -1,0 +1,26 @@
+-- Find all co-acrtors of Tom Cruise 
+SELECT A2.name, COUNT (DISTINCT A1.name) AS "Tom Cruise Co-Actors"
+FROM actors A1, actors A2, movies M
+WHERE 
+    M.mid = A2.mid AND
+    A2.name = 'Tom Cruise' AND
+    M.mid = A1.mid AND NOT
+    A1.name = 'Tom Cruise'
+GROUP BY A2.name;
+
+-- Find actor with most co-actors
+CREATE OR REPLACE VIEW max_co_actors AS
+SELECT A2.name, COUNT (DISTINCT A1.name) AS most_co_actors
+FROM actors A1, actors A2, movies M
+WHERE 
+    M.mid = A2.mid AND
+    M.mid = A1.mid
+GROUP BY A2.name;
+
+
+-- Print the actor with the most co-actors
+
+SELECT name, most_co_actors
+FROM max_co_actors
+ORDER BY most_co_actors DESC
+LIMIT 1;

@@ -1,0 +1,8 @@
+-- ii. Get the information for the movies with the highest rating, sorted ascending by movie ID
+SELECT M.mid, M.title, M.year, M.rating, M.num_ratings
+FROM movies M
+WHERE M.rating IN (
+    SELECT MAX(M.rating)
+    FROM movies M
+)
+ORDER BY M.mid;

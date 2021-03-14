@@ -1,0 +1,9 @@
+-- iv. Get the information for the movies with the lowest rating, sorted by ascending movie ID
+SELECT M.mid, M.title, M.year, M.rating, M.num_ratings
+FROM movies M
+WHERE M.rating IN (
+    SELECT MIN(M.rating)
+    FROM movies M
+    WHERE M.num_ratings > 0
+)
+ORDER BY M.mid;

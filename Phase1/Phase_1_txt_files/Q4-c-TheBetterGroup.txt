@@ -1,0 +1,12 @@
+CREATE MATERIALIZED VIEW maximum_co_actors AS
+SELECT A2.name, COUNT (DISTINCT A1.name) AS most_co_actors
+FROM actors A1, actors A2, movies M
+WHERE 
+    M.mid = A2.mid AND
+    M.mid = A1.mid
+GROUP BY A2.name;
+
+SELECT name, most_co_actors
+FROM max_co_actors
+ORDER BY most_co_actors DESC
+LIMIT 1;

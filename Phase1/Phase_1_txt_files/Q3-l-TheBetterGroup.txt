@@ -1,0 +1,110 @@
+--
+
+CREATE OR REPLACE VIEW tags_in_common AS
+    WITH tags_count AS (
+        SELECT COUNT(tid) 
+        FROM tags
+    )
+    SELECT M2.mid, T2.title, T2.count::REAL / C.count::REAL AS similarity
+    FROM tags_count C, movies M2 RIGHT JOIN (
+        SELECT M1.mid, M1.title, COUNT(T1.tid)
+        FROM tags T1, movies M1
+        WHERE 
+            T1.tid IN (
+                SELECT T.tid
+                FROM tags T, movies M
+                WHERE 
+                    M.title = 'Mr. & Mrs. Smith' AND
+                    T.mid = M.mid
+            ) AND 
+            M1.title != 'Mr. & Mrs. Smith' AND
+            T1.mid = M1.mid
+        GROUP BY M1.mid, M1.title
+        ORDER BY COUNT(T1.tid) DESC
+    ) T2
+    ON T2.mid = M2.mid
+    ORDER BY similarity DESC;
+
+SELECT * FROM tags_in_common;
+
+
+--
+
+CREATE OR REPLACE VIEW actors_in_common AS
+    WITH actors_count AS (
+        SELECT COUNT(distinct name) 
+        FROM actors
+    )
+    SELECT M2.mid, A2.title, A2.count::REAL / C.count::REAL AS similarity
+    FROM actors_count C, movies M2 RIGHT JOIN (
+        SELECT M1.mid, M1.title, COUNT(A1.name)
+        FROM actors A1, movies M1
+        WHERE 
+            A1.name IN (
+                SELECT A.name
+                FROM actors A, movies M
+                WHERE 
+                    M.title = 'Mr. & Mrs. Smith' AND
+                    A.mid = M.mid
+            ) AND 
+            M1.title != 'Mr. & Mrs. Smith' AND
+            A1.mid = M1.mid
+        GROUP BY M1.mid, M1.title
+        ORDER BY COUNT(A1.name) DESC
+    ) A2
+    ON A2.mid = M2.mid
+    ORDER BY similarity DESC;
+
+SELECT * FROM actors_in_common;
+
+--
+
+CREATE OR REPLACE VIEW genres_in_common AS
+    WITH genres_count AS (
+        SELECT COUNT(distinct genre) 
+        FROM genres
+    )
+    SELECT M2.mid, G2.title, G2.count::REAL / C.count::REAL AS similarity
+    FROM genres_count C, movies M2 RIGHT JOIN(
+        SELECT M1.mid, M1.title, COUNT(G1.genre)
+        FROM genres G1, movies M1
+        WHERE 
+            G1.genre IN (
+                SELECT G.genre
+                FROM genres G, movies M
+                WHERE 
+                    M.title = 'Mr. & Mrs. Smith' AND
+                    G.mid = M.mid
+            ) AND 
+            M1.title != 'Mr. & Mrs. Smith' AND
+            G1.mid = M1.mid
+        GROUP BY M1.mid, M1.title
+        ORDER BY COUNT(G1.genre) DESC
+    ) G2
+    ON G2.mid = M2.mid
+    ORDER BY similarity DESC;
+
+SELECT * FROM genres_in_common;
+
+--
+
+CREATE OR REPLACE FUNCTION norm(REAL) RETURNS REAL
+    AS 
+        $$
+        DECLARE normal REAL;
+        BEGIN
+            SELECT (($1 - 2005) / (MAX(M.year) - MIN(M.year))) INTO normal
+            FROM movies M;
+
+            RETURN normal;
+        END;
+        $$
+    LANGUAGE plpgsql;
+
+CREATE OR REPLACE VIEW age_gap AS
+    SELECT M1.mid, M1.title, norm(M1.year::REAL) as gap
+    FROM movies M1
+    GROUP BY M1.mid, M1.title, M1.year
+    ORDER BY gap ASC;
+
+SELECT * FROM age_gap;

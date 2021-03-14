@@ -1,0 +1,25 @@
+-- Get the year, title and rating of the lowest-rated and highest-rated movies for each year, between 2005 and 2011 inclusively. If tied, use ascending title
+
+SELECT M2.year, M2.title, M2.rating
+FROM movies M2
+INNER JOIN (
+    SELECT M1.year, MAX(M1.rating) as highest_rating
+    FROM movies M1
+    WHERE M1.year BETWEEN 2005 AND 2011 AND M1.num_ratings > 0
+    GROUP BY M1.year
+    ORDER BY M1.year ASC
+) highest ON (highest.year = M2.year AND highest.highest_rating = M2.rating)
+
+UNION
+
+SELECT M4.year, M4.title, M4.rating
+FROM movies M4
+INNER JOIN (
+    SELECT M3.year, MIN(M3.rating) as lowest_rating
+    FROM movies M3
+    WHERE M3.year BETWEEN 2005 AND 2011 AND M3.num_ratings > 0
+    GROUP BY M3.year
+    ORDER BY M3.year ASC
+) lowest ON (lowest.year = M4.year AND lowest.lowest_rating = M4.rating)
+
+ORDER BY year ASC, rating ASC, title ASC

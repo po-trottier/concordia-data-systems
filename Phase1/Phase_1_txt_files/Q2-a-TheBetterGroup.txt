@@ -1,0 +1,43 @@
+CREATE TABLE movies (
+    mid             INTEGER UNIQUE, 
+    title           VARCHAR, 
+    year            INTEGER, 
+    rating          REAL CHECK (rating BETWEEN 0.0 AND 5.0), 
+    num_ratings     INTEGER,
+    PRIMARY KEY     (mid)
+);
+
+CREATE TABLE actors (
+    mid             INTEGER REFERENCES movies(mid), 
+    name            VARCHAR, 
+    cast_position   INTEGER,
+    PRIMARY KEY     (mid, name)
+);
+
+CREATE TABLE genres (
+    mid             INTEGER REFERENCES movies(mid), 
+    genre           VARCHAR,
+    PRIMARY KEY     (mid, genre)
+);
+
+CREATE TABLE tag_names (
+    tid             INTEGER, 
+    tag             VARCHAR,
+    PRIMARY KEY     (tid)
+);
+
+CREATE TABLE tags (
+    mid             INTEGER REFERENCES movies(mid), 
+    tid             INTEGER REFERENCES tag_names(tid),
+    PRIMARY KEY     (mid, tid)
+);
+
+COPY movies FROM '/srv/soen363/phase1/movies.dat';
+
+COPY actors FROM '/srv/soen363/phase1/actors.dat';
+
+COPY genres FROM '/srv/soen363/phase1/genres.dat';
+
+COPY tag_names FROM '/srv/soen363/phase1/tag_names.dat';
+
+COPY tags FROM '/srv/soen363/phase1/tags.dat';
