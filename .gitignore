@@ -3,3 +3,8 @@ Phase1/~$oject Phase1-The Better Group.docx
 
 *.tmp
 .DS_Store
+
+*.pickle
+
+Phase2/Dataset/output/matches.json
+Phase2/Dataset/output/*.csv
