@@ -6,5 +6,5 @@ Phase1/~$oject Phase1-The Better Group.docx
 
 *.pickle
 
-Phase2/Dataset/output/matches.json
-Phase2/Dataset/output/*.csv
+Phase2/Dataset/output/json/
+Phase2/Dataset/output/csv/
