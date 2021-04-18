@@ -163,4 +163,4 @@ process_data(load_data())
 
 # Save the files
 save_csv_files(dict_data)
-# save_json_file(json_data)
+save_json_file(json_data)
