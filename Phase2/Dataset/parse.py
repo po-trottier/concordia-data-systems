@@ -42,6 +42,7 @@ def process_data(matches):
 
 # Get Games CSV Format
 def get_games(matches):
+  ids = {}
   games = []
   for match in matches:
     clone = match.copy()
@@ -52,7 +53,9 @@ def get_games(matches):
     del clone['participantIdentities']
     del clone['participants']
     del clone['teams']
-    games.append(clone)
+    if not ids.get(match['gameId']):
+      games.append(clone)
+    ids[match['gameId']] = True
   return games
 
 # Get Teams CSV Format
@@ -160,4 +163,4 @@ process_data(load_data())
 
 # Save the files
 save_csv_files(dict_data)
-save_json_file(json_data)
+# save_json_file(json_data)

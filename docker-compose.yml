@@ -6,10 +6,24 @@ services:
     environment:
        - POSTGRES_USER=postgres
        - POSTGRES_PASSWORD=PASSWORD
-       - PGDATA=/var/lib/postgresql/data/pgdata
        - POSTGRES_DB=postgres
+       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
-       - ./Data:/var/lib/postgresql
+       - ./Data/postgres:/var/lib/postgresql
        - ./Phase1/Dataset/:/srv/soen363/phase1/
+       - ./Phase2/Dataset/output/csv:/srv/soen363/phase2/
     ports:
        - 5432:5432
+
+  mongodb:
+    image: mongo
+    restart: unless-stopped
+    environment:
+       - MONGO_INITDB_ROOT_USERNAME=mongo
+       - MONGO_INITDB_ROOT_PASSWORD=PASSWORD
+       - MONGO_INITDB_DATABASE=mongodb
+    volumes:
+       - ./Data/mongodb:/data/db
+       - ./Phase2/Dataset/output/json:/srv/soen363/phase2/
+    ports:
+       - 27017:27017
