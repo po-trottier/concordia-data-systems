@@ -1,0 +1,64 @@
+[{$match: {
+  gameMode: "CLASSIC"
+}}, {$unwind: "$teams"}, {$group: {
+  _id: {
+    gameId: "$gameId",
+    teamId: "$teams.teamId"
+  },
+  firstRift: { $first:"$teams.firstRiftHerald" },
+  win: { $first:"$teams.win" }
+}}, {$sort: {
+  "_id.gameId": 1,
+  firstRift: -1
+}}, {$group: {
+  _id: "$_id.gameId",
+  firsRiftWin: {
+    $first: "$win"
+  }
+}}, {$project: {
+  firstRiftWin: {
+    $switch: {
+      branches: [
+         { case: { $eq: [ "$firsRiftWin", "Win" ] }, then: true },
+         { case: { $eq: [ "$firsRiftWin", "Fail" ] }, then: false }
+      ],
+      default: "?"
+    }
+  }
+}}, {$group: {
+  _id: "$firstRiftWin",
+  count: { $sum: 1 }
+}}, {$match: {
+  _id: {$not: { $eq: "?" } }
+}}, {$sort: {
+  _id: -1
+}}, {$group: {
+  _id: null,
+  firstRiftWins: {
+    $first: "$count"
+  },
+  firstRiftLosses: {
+    $last: "$count"
+  },
+}}, {$project: {
+  firstRiftWins: 1,
+  firstRiftLosses: 1,
+  totalGames: { $sum: [
+    "$firstRiftWins", 
+    "$firstRiftLosses"
+  ]}
+}}, {$project: {
+  firstRiftWinRate: {
+    $divide: [
+      "$firstRiftWins",
+      "$totalGames"
+    ]
+  }
+}}, {$project: {
+  firstRiftWinRate: {
+    $multiply: [
+      "$firstRiftWinRate",
+      100
+    ]
+  }
+}}]

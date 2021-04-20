@@ -1,0 +1,19 @@
+1 - Do games that end with at least a 10-kill difference between teams end faster than games with a lesser kill differential?
+
+    Games with at least a 10-kill difference end on average 2.03 minutes earlier than games with a lesser kill differential. Having a large kill differential therefore does not change the length of a game significantly.
+
+2 - What is the average gold difference between the winning and losing teams in all matches?
+
+    On average, the winning team has 8886 more gold than the losing team. 
+
+3 - Does the team with the highest total vision score win more often?
+
+    73.82% of the team, the team with the highest total vision score wins.
+
+4 - Does the team that kills the first Rift Herald win more often?
+
+    The win-rate for the team that get the first Rift Herald is of 64.4% which is considerably higher than 50%, so yes.
+
+5 - Which champion (championId) gets the most multikills on average?
+
+    ChampionID 11 (Master Yi) has the highest amount of multi-kills on average (1.775 / game).

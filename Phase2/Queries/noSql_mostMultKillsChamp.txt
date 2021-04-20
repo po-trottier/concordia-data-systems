@@ -1,0 +1,32 @@
+[{$match: {
+  gameMode: "CLASSIC"
+}}, {$unwind: "$participants"}, {$group: {
+  _id: "$participants.championId",
+  doubleKills: {
+    $avg: "$participants.stats.doubleKills"
+  },
+  tripleKills: {
+    $avg: "$participants.stats.tripleKills"
+  },
+  quadraKills: {
+    $avg: "$participants.stats.quadraKills"
+  },
+  pentaKills: {
+    $avg: "$participants.stats.pentaKills"
+  },
+  unrealKills: {
+    $avg: "$participants.stats.unrealKills"
+  }
+}}, {$project: {
+  multiKillsAvg: {
+    $sum: [
+      "$doubleKills",
+      "$tripleKills",
+      "$quadraKills",
+      "$pentaKills",
+      "$unrealKills"
+    ]
+  }
+}}, {$sort: {
+  multiKillsAvg: -1
+}}, {$limit: 1}]
