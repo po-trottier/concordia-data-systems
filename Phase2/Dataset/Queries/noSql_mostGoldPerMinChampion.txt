@@ -1,0 +1,32 @@
+[{$match: {
+  gameMode: "CLASSIC"
+}}, {$unwind: "$participants"}, {$group: {
+  _id: {
+    "gameId": "$gameId",
+    "championID": "$participants.championId"
+  },
+  gameDuration: {
+    $sum: "$gameDuration"
+  },
+  goldEarned: {
+    $sum: "$participants.stats.goldEarned"
+  }
+}}, {$project: {
+  gameDurationMinutes:{
+    $divide: ["$gameDuration", 60]
+  },
+  goldEarned:1
+}}, {$project: {
+  goldPerMinute: {
+    $divide: ["$goldEarned", "$gameDurationMinutes"]
+  }
+}}, {$group: {
+  _id: {
+    "championID": "$_id.championID"
+  },
+  goldPerMinuteAvg:{
+    $avg:"$goldPerMinute"
+  }
+}}, {$sort: {
+  "goldPerMinuteAvg": -1
+}}, {$limit: 10}]

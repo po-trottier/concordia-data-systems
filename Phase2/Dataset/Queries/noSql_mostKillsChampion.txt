@@ -1,0 +1,19 @@
+[{$match: {
+  gameMode: "CLASSIC"
+}}, {$unwind: "$participants"}, {$group: {
+  _id: {
+    "championId": "$participants.championId",
+  },
+  total_kills: {
+    $sum: "$participants.stats.kills"
+  },
+  total_games_count: {
+    $sum: 1
+  }
+}}, {$project: {
+  average_kills: {
+    $divide: ["$total_kills", "$total_games_count"]
+  }
+}}, {$sort: {
+  "average_kills": -1
+}}, {$limit: 10}]

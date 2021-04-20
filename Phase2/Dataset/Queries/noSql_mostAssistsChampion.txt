@@ -1,0 +1,19 @@
+[{$match: {
+  gameMode: "CLASSIC"
+}}, {$unwind: "$participants"}, {$group: {
+  _id: {
+    "championId": "$participants.championId",
+  },
+  total_assists: {
+    $sum: "$participants.stats.assists"
+  },
+  total_games_count: {
+    $sum: 1
+  }
+}}, {$project: {
+  average_assists: {
+    $divide: ["$total_assists", "$total_games_count"]
+  }
+}}, {$sort: {
+  "average_assists": -1
+}}, {$limit: 10}]

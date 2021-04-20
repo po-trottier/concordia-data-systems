@@ -1,0 +1,74 @@
+[{$match: {
+  gameMode: "CLASSIC"
+}}, {$unwind: "$teams"}, {$group: {
+  _id: {
+    "gameId": "$gameId",
+    "teamId": "$teams.teamId"
+  },
+  win: {
+    $first: "$teams.win"
+  },
+  dragonKills: {
+    $first:"$teams.dragonKills"
+  }
+}}, {$project: {
+  dragonKills: 1,
+  win:{
+    $switch: {
+      branches: [
+         { case: { $eq: [ "$win", "Win" ] }, then: true },
+         { case: { $eq: [ "$win", "Fail" ] }, then: false }
+      ],
+      default: "?"
+    }
+  },
+  hasSoul:{
+    $switch: {
+      branches: [
+         { case: { $gte: [ "$dragonKills", 4 ] }, then: true },
+         { case: { $lt: [ "$dragonKills", 4 ] }, then: false }
+      ],
+      default: "?"
+    }
+  }
+}}, {$group: {
+  _id: {
+    hasSoul: "$hasSoul",
+    win: "$win"
+  },
+  count: {$sum:1}
+}}, {$match: {
+  "_id.win": {$not:{$eq:"?"}}
+}}, {$sort: {
+  "_id.hasSoul":-1,
+  "_id.win":-1
+}}, {$group: {
+  _id: "$_id.hasSoul",
+  winCount: {
+    $first:"$count"
+  },
+  lossCount: {
+    $last:"$count"
+  }
+}}, {$project: {
+  _id:0,
+  hasSoul: "$_id",
+  winCount:1,
+  totalGames:{$sum:["$winCount", "$lossCount"]},
+}}, {$project: {
+  hasSoul:1,
+  winCount:1,
+  totalGames:1,
+  winRate:{$divide:["$winCount", "$totalGames"]}
+}}, {$project: {
+  hasSoul:1,
+  winCount:1,
+  totalGames:1,
+  winRate:{$multiply:["$winRate", 100]}
+}}, {$sort: {
+  hasSoul:-1
+}}, {$group: {
+  _id: null,
+  soulWinRate:{$first:"$winRate"},
+  noSoulWinRate:{$last:"$winRate"}
+}}]

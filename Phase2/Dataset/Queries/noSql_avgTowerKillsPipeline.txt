@@ -1,0 +1,9 @@
+[{$match: {
+  gameMode: "CLASSIC"
+}}, {$unwind: "$teams"}, {$group: {
+  _id:
+    null,
+  avgTowerKills: {
+    $avg: "$teams.towerKills"
+  }
+}}]
