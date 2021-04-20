@@ -42,7 +42,7 @@
     $divide: ["$moreTimeCCingWin", "$total"]
   }
 }}, {$project: {
-  betterVisionWinPercentage: {
+  moreTimeCCingWinPercentage: {
     $multiply: ["$moreTimeCCingWinPercentage", 100]
   }
 }}]
