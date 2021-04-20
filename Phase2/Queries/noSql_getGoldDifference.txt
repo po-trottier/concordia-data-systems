@@ -1,0 +1,26 @@
+[{$match: {
+  gameMode: "CLASSIC"
+}}, {$unwind: "$participants"}, {$group: {
+  _id: {
+    gameId: "$gameId",
+    teamId: "$participants.teamId"
+  },
+  win: { $first: "$participants.stats.win" },
+  totalGold: { $sum: "$participants.stats.goldEarned" }
+}}, {$sort: {
+  "_id.gameId": 1,
+  win: -1
+}}, {$group: {
+  _id: "$_id.gameId",
+  winnerGold: { $first: "$totalGold" },
+  loserGold: { $last: "$totalGold" },
+}}, {$project: {
+  goldDifferential: {
+    $subtract: ["$winnerGold", "$loserGold"]
+  }
+}}, {$group: {
+  _id: null,
+  averageGoldDifference: {
+    $avg: "$goldDifferential"
+  }
+}}]

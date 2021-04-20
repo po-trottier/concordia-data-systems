@@ -1,0 +1,88 @@
+[{$match: {
+  gameMode: "CLASSIC"
+}}, {$unwind: "$participants"}, {$group: {
+  _id: {
+    gameId: "$gameId",
+    teamId: "$participants.teamId"
+  },
+  gameDuration: { $first: "$gameDuration" },
+  totalKills: { $sum: "$participants.stats.kills" }
+}}, {$sort: {
+  "_id.gameId": 1
+}}, {$group: {
+  _id: "$_id.gameId",
+  gameDuration: {
+    $first: "$gameDuration"
+  },
+  team1Kills: {
+    $first: "$totalKills"
+  },
+  team2Kills: {
+    $last: "$totalKills"
+  }
+}}, {$project: {
+  gameDuration: 1,
+  killsDifference: {
+    $subtract: [
+      "$team1Kills",
+      "$team2Kills"
+    ]
+  }
+}}, {$project: {
+  gameDuration: 1,
+  killsDifference: {
+    $abs: "$killsDifference"
+  }
+}}, {$project: {
+  gameDuration: 1,
+  killsDifference:{ 
+    $switch: {
+      branches: [
+         { case: { $lt: [ "$killsDifference", 10 ] }, then: "<10" },
+         { case: { $gte: [ "$killsDifference", 10 ] }, then: ">=10" }
+      ],
+      default: "?"
+    }
+  }
+}}, {$group: {
+  _id: "$killsDifference",
+  averageGameDuration: {
+    $avg: "$gameDuration"
+  },
+  count: { $sum: 1 }
+}}, {$project: {
+  count: 1,
+  averageGameDuration: {
+    $divide: [
+      "$averageGameDuration",
+      60
+    ]
+  }
+}}, {$sort: {
+  _id: 1
+}}, {$group: {
+  _id: null,
+  lessThan10KillsDuration: {
+    $first: "$averageGameDuration"
+  },
+  lessThan10KillsCount: {
+    $first: "$count"
+  },
+  atLeast10KillsDuration: {
+    $last: "$averageGameDuration"
+  },
+  atLeast10KillsCount: {
+    $last: "$count"
+  },
+}}, {$project: {
+  lessThan10KillsDuration: 1,
+  lessThan10KillsCount: 1,
+  atLeast10KillsDuration: 1,
+  atLeast10KillsCount: 1,
+  timeDifference: {
+    $subtract: [
+      "$atLeast10KillsDuration",
+      "$lessThan10KillsDuration",
+    ]
+  }
+}}]

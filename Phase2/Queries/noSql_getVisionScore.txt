@@ -1,0 +1,40 @@
+[{$match: {
+  gameMode: "CLASSIC"
+}}, {$unwind: "$participants"}, {$group: {
+  _id: {
+    "gameId": "$gameId",
+    "teamId": "$participants.teamId"
+  },
+  vision: { $sum: "$participants.stats.visionScore" },
+  win: { $first: "$participants.stats.win" }
+}}, {$sort: {
+  "_id.gameId": 1,
+  "vision": -1
+}}, {$group: {
+  _id: "$_id.gameId",
+  betterVisionWin: { $first: "$win" }
+}}, {$group:  { 
+   "_id": {"betterVisionWin":  "$betterVisionWin"}, 
+   "count": { $sum: 1 }
+ }}, {$sort: {
+  "_id.betterVisionWin": -1
+}}, {$group: {
+  _id: null,
+  betterVisionWin: {$first: "$count"},
+  worseVisionWin: {$last: "$count"},
+  total: {$sum: "$count"},
+}}, {$project: {
+  betterVisionWinPercentage: {
+    $divide: [
+      "$betterVisionWin",
+      "$total"
+    ]
+  }
+}}, {$project: {
+  betterVisionWinPercentage: {
+    $multiply: [
+      "$betterVisionWinPercentage",
+      100
+    ]
+  }
+}}]
