@@ -1,0 +1,1 @@
+CREATE OR REPLACE VIEW assistz ASSELECT championId, AVG(assists) AS assist_averageFROM participants_filtered JOIN stats_filtered ON participants_filtered.gameId = stats_filtered.gameId AND participants_filtered.participantId = stats_filtered.participantIdGROUP BY championId;SELECT * FROM assistzORDER BY assist_average DESCLIMIT 1;

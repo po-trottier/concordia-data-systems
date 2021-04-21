@@ -1,0 +1,1 @@
+CREATE OR REPLACE VIEW deathz ASSELECT championId, AVG(deaths) AS death_averageFROM participants_filtered JOIN stats_filtered ON participants_filtered.gameId = stats_filtered.gameId AND participants_filtered.participantId = stats_filtered.participantIdGROUP BY championId;SELECT * FROM deathzORDER BY death_average DESCLIMIT 1;

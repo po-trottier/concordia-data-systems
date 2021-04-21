@@ -5,7 +5,7 @@ import os
 import math
 
 # Setting the maximum to -1 will process all the entries
-MAX_NUMBER_ENTRIES = 1000
+MAX_NUMBER_ENTRIES = -1
 
 # Initialize variables
 dict_data = []
