@@ -5,7 +5,7 @@ import os
 import math
 
 # Setting the maximum to -1 will process all the entries
-MAX_NUMBER_ENTRIES = -1
+MAX_NUMBER_ENTRIES = 1000
 
 # Initialize variables
 dict_data = []
@@ -163,4 +163,4 @@ process_data(load_data())
 
 # Save the files
 save_csv_files(dict_data)
-save_json_file(json_data)
+# save_json_file(json_data)
